@@ -49,12 +49,7 @@ class Player():
            
     def __str__(self):
         return f'Player {self.name} has {len(self.all_cards)} cards with value of {self.hand}'
-"""
-two_of_hearts = Card('Hearts','Two')
-three_of_clubs = Card('Clubs', 'Three')
 
-print(two_of_hearts.value + three_of_clubs.value)
-"""
 new_deck = Deck()
 human = Player('Jorge')
 for x in range(3):
