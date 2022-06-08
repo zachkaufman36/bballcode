@@ -1,18 +1,18 @@
-import random
+"""import random
 
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
 ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
-values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':11, 'Queen':12, 'King':13, 'Ace':14}
+values = {'One':1, 'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':11, 'Queen':12, 'King':13, 'Ace':14}
 
 class Card():
     #creates individual cards
-    def __init__(self,suit,rank):
-        self.suit = suit
-        self.rank = rank
-        self.value = values[rank]
+    def __init__(self,suits,ranks):
+        self.suits = suits
+        self.ranks = ranks
+        self.values = values[ranks]
 
     def __str__(self):
-        return self.rank + ' of ' + self.suit
+        return self.ranks + ' of ' + self.suits
 
 class Deck():
    
@@ -45,15 +45,36 @@ class Player():
     
     def add_cards(self,new_cards):
         self.all_cards.append(new_cards)
-        self.hand += new_cards.value
-           
+        self.hand += new_cards.values
+
+    def ace_as_one(self):
+        self.hand -= 10
+
     def __str__(self):
         return f'Player {self.name} has {len(self.all_cards)} cards with value of {self.hand}'
 
 new_deck = Deck()
 human = Player('Jorge')
-for x in range(3):
+for x in range(52):
     human.add_cards(new_deck.deal_one())
-for y in range(3):
-    print (human.all_cards[y])
+    if human.all_cards[x].ranks == 'Ace':
+        choose = input('Choose between One or Ace: ')
+        if choose == 'One':
+            human.ace_as_one()
+            human.all_cards[x].ranks = choose
+for y in range(52):
+    if human.all_cards[y].ranks == 'Ace':
+        print(human.all_cards[y])
 print(human)
+"""
+i = 0
+y = ['ace', 'squirrel', 5]
+z = 22
+if z > 21:
+    for i in range(3):
+        if y[i] == 'ace':
+            z -= 10
+            print(z)
+            break
+if z> 21:
+    print(y)

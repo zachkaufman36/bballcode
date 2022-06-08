@@ -44,6 +44,9 @@ class Player():
         self.all_cards.append(new_cards)
         self.hand += new_cards.values
     
+    def ace_as_one(self):
+        self.hand -= 10
+
     def hand_reset(self):
         self.hand = 0
 
@@ -99,11 +102,6 @@ while True:
                 for x in range(0,2):
                     dealer.add_cards(new_deck.deal_one())
                     player.add_cards(new_deck.deal_one())
-                    if player.all_cards[x].ranks == 'Ace':
-                        choose = input('Choose between One or Ace: ')
-                        player.all_cards[x].ranks = choose
-                    else:
-                        pass
                     print(f'The player has {player.all_cards[x]}')
                 print(f'The dealer has {dealer.all_cards[0]}')
                 deal = False
@@ -114,19 +112,23 @@ while True:
                 money += bet.withdraw(wdw2)
                 x += 1
                 player.add_cards(new_deck.deal_one())
-                if player.all_cards[x].ranks == 'Ace':
-                    choose = input('Choose between One or Ace: ')
-                    player.all_cards[x].ranks = choose
-                else:
-                    pass
                 print(player.all_cards[x])
                 print(player)
                 if player.hand > 21:
-                    print(f'{dealer.name} has won due to bust')
-                    money = 0
-                    print(bet.balance)
-                    game_on = False
-                    break
+                    for y in range(len(player.all_cards)):
+                        #inversing logic should get rid of second if statement
+                        if player.all_cards[y].ranks == 'Ace':
+                            player.ace_as_one()
+                            print('Ace has been converted to being a one')
+                            player.all_cards[y].ranks = 'One'
+                    if player.hand > 21:
+                        print(f'{dealer.name} has won due to bust')
+                        money = 0
+                        print(bet.balance)
+                        game_on = False    
+                        break
+                    if game_on == False:
+                        break                    
                 hit_choice = input('Would you like to hit or stay?: ')
             else:
                 y = 0
