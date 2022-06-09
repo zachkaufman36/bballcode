@@ -66,7 +66,7 @@ for y in range(52):
     if human.all_cards[y].ranks == 'Ace':
         print(human.all_cards[y])
 print(human)
-"""
+
 i = 0
 y = ['ace', 'squirrel', 5]
 z = 22
@@ -78,3 +78,4 @@ if z > 21:
             break
 if z> 21:
     print(y)
+"""

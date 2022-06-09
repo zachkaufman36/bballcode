@@ -65,7 +65,7 @@ class Account():
     
     def withdraw(self,withdraw):
         if withdraw > self.balance:
-            return f'Your balance is {self.balance}, pick a number below that'
+            print(f'Your balance is {self.balance}, pick a number below that')
         else:
             self.balance -= withdraw
             return withdraw
@@ -81,15 +81,29 @@ new_deck.shuffle()
 bet = Account()
 
 while True:
+    #user chooses if they wish to play
     choice = input('Do you wish to play a round of blackjack? ')
-    if choice  == 'yes':
+    if choice  in ['yes','y','Yes','Y','ya','sure']:
         game_on = True
         deal = True
+        #game begins
         while game_on:
-            wdw = int(input('Place buy in: '))
+            #inital bet is placed
+            try:
+                wdw = int(input('Place buy in: '))
+            except:
+                print("That can't be made into an integer, try again")
+                continue
+            while wdw > bet.balance:
+                try:
+                    wdw = int(input('you pick a value to high, try again: '))
+                except:
+                    print("That can't be made into an integer, try again")
+                    continue
             money = bet.withdraw(wdw)
             print(bet.balance)
             if deal == True:
+                #clears player's and dealer's hands, and resets the values
                 for rmvl in range(len(player.all_cards)):
                     player.remove_one()
                 player.hand_reset()
@@ -100,28 +114,48 @@ while True:
                 print(dealer)
                 x = 0
                 for x in range(0,2):
+                    #deals for player and dealer
                     dealer.add_cards(new_deck.deal_one())
                     player.add_cards(new_deck.deal_one())
+                    #reveals player's hand
                     print(f'The player has {player.all_cards[x]}')
+                #reveals singular card in dealer's hand
                 print(f'The dealer has {dealer.all_cards[0]}')
                 deal = False
             print(player)
+            #player decides to hit or stay
             hit_choice = input('Would you like to hit or stay?: ')
             while hit_choice == 'hit':
-                wdw2 = int(input('Place bet to proceed: '))
+                #person places bet
+                try:
+                    wdw2 = int(input('Place bet to proceed: '))
+                except:
+                    print("That can't be made into an integer, try again")
+                    continue
+                while wdw2 > bet.balance:
+                    try:
+                        wdw2 = int(input('you pick a value to high, try again: '))
+                    except:
+                        print("That can't be made into an integer, try again")
+                        continue
                 money += bet.withdraw(wdw2)
                 x += 1
                 player.add_cards(new_deck.deal_one())
                 print(player.all_cards[x])
                 print(player)
                 if player.hand > 21:
+                    #see if in function can fix need for double if statement
+                    """while 'Ace' in player.all_cards:
+                        print('Thats an Ace')
+                        break"""    
                     for y in range(len(player.all_cards)):
-                        #inversing logic should get rid of second if statement
+                        #cycles through cards in hand to check for aces, then reduces their value to 1 if hand value is over 21
                         if player.all_cards[y].ranks == 'Ace':
                             player.ace_as_one()
                             print('Ace has been converted to being a one')
                             player.all_cards[y].ranks = 'One'
                     if player.hand > 21:
+                        #makes dealer win if player's hand value is over 21
                         print(f'{dealer.name} has won due to bust')
                         money = 0
                         print(bet.balance)
@@ -133,10 +167,12 @@ while True:
             else:
                 y = 0
                 while dealer.hand <= player.hand:
+                    #dealer draws until the value of their hand is higher
                     y += 1
                     dealer.add_cards(new_deck.deal_one())
                     print(f'The dealer draws {dealer.all_cards[y]}')
                     if dealer.hand > 21:
+                        #player wins based on dealer bust
                         bet.deposit((money*2))
                         print(f'{player.name} has won due to bust')
                         print(bet.balance)
@@ -147,20 +183,24 @@ while True:
                     pass
             
             if player.hand <= 21 and dealer.hand <= 21:
+                #player wins if their hand is larger
                 if player.hand > dealer.hand:
                     bet.deposit((money*2))
                     print('Player wins!')
                     print(bet.balance)
                     break
                 if player.hand <= dealer.hand:
+                    #dealer wins if their hand is larger
                     print('Dealer wins!')
                     money = 0
                     print(dealer)
                     print(bet.balance)
                     break           
-    else:
+    elif choice in ['no','n','No','N','nah','nope']:
         print('Lameo bitch')
         break
+    else:
+        print('That is not a valid answer, please re-enter your answer')
 
     
 
