@@ -67,33 +67,35 @@ class Hotel():
         self.regular = [" "]*7
 
     def booking(self, begin_date, end_date, hotel_calendar):
-        for date in range(begin_date, end_date):
+        self.choice = input("Where would you like to stay? ")
+        for date in range(begin_date, end_date+1):
             if hotel_calendar[date] == None:
                 hotel_calendar[date] = (self.penthouse, self.regular)
             else:
                 pass
 
-        self.choice = input("Where would you like to stay? ")
-        if " " not in self.penthouse and " " not in self.regular:
-            print("We have no rooms available, we appologize")
-        else:
-            if self.choice == "penthouse":
-                for room in range(len(self.penthouse)):
-                    if self.penthouse[room] != " ":
-                        print("No room here")
-                        
-                    else:
-                        self.penthouse[room] = self.name
-                        return self.penthouse + self.regular
+            if " " not in hotel_calendar[date][0] and " " not in hotel_calendar[date][1]:
+                print("We have no rooms available, we appologize")
+            else:
+                if self.choice == "penthouse":
+                    for room in range(len(hotel_calendar[date][0])):
+                        if hotel_calendar[date][0][room] != " ":
+                            print("No room here")
+                            
+                        else:
+                            hotel_calendar[date][0][room] = self.name
+                            break
+                    break #Allows for single day booking, not booking for multiple days
 
-            elif self.choice == "regular":
-                for room in range(len(self.regular)):
-                    if self.regular[room] != " ":
-                        print("No room here")
+                elif self.choice == "regular":
+                    for room in range(len(hotel_calendar[date][1])):
+                        if hotel_calendar[date][1][room] != " ":
+                            print("No room here")
 
-                    else:
-                        self.regular[room] = self.name
-                        return self.penthouse + self.regular   
+                        else:
+                            hotel_calendar[date][1][room] = self.name
+                            break
+                    break #Allows for single day booking, not booking for multiple days
 
 
 if __name__ == "__main__":
@@ -101,13 +103,16 @@ if __name__ == "__main__":
         name = input("What is your name? ") 
         date = int(input("What day would you like to fly? 1-365: "))  
         airline = Airline(name)
-        hotel = Hotel(name, penthouse, regular)
+        hotel = Hotel(name)
         print(airline.booking(date, airline_calendar))
         print(airline_calendar)
-        """print(hotel.booking())
+        begin_date = int(input("Please enter a begin date for your hotel stay: "))
+        end_date = int(input("Please enter an end date for your hotel stay: "))
+        print(hotel.booking(begin_date, end_date, hotel_calendar))
+        print(hotel_calendar)
         if " " not in airline.first_class and " " not in airline.business:
             print("The plane is full")
             break
         if " " not in hotel.penthouse and " " not in hotel.regular:
             print("The plane is full")
-            break"""
+            break
