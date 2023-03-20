@@ -31,7 +31,7 @@ def players_of_year(path, date):
             namelist.update({tag:name})
 
 
-    with open(f'{path}\\player_jsons\\{date}\\playerdict_{date}.json', 'w') as data:
+    with open(f'{path}/player_jsons/{date}/playerdict_{date}.json', 'w') as data:
         data.write(json.dumps(namelist))
 
     data.close()
