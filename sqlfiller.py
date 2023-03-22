@@ -1,5 +1,3 @@
-import sqlite3
-
 #creates a table if a table for that year doesn't currently exist
 def tableexistance(con, date):
     # creates a cursor to move around the database with
@@ -11,6 +9,7 @@ def tablefiller(con, data, date):
     # creates a cursor to move around the database with
     cur = con.cursor()
     repeat = cur.execute(f'SELECT Name, GameDate FROM Year_{date} WHERE EXISTS(SELECT Name, GameDate FROM Year_{date} WHERE Name = "{data[0]}" AND GameDate = "{data[4]}")')
+    print(repeat)
     if repeat == True:
         return 1
     else:
