@@ -5,6 +5,7 @@ import os
 import json
 import bballdicts # Needs references to older non-existant teams to exist, otherwise, breaks
 import internetgrabber
+import sqlfiller
 import sqlite3
 from basketball_reference_scraper.teams import get_roster
 
@@ -71,6 +72,11 @@ if __name__ == '__main__':
 
     while date > currentyear or date < 1949:
         date = int(input("Please choose a year you would like to pull your data from: "))
+    
+    # connects to database 
+    con = sqlite3.connect(f"BasketballPlayers.db")
+
+    sqlfiller.tableexistance(con, date)
 
     file_existance(path, date)
     filefiller(path, date)
@@ -88,24 +94,16 @@ if __name__ == '__main__':
         x += 1
         nameteamgamestatus = playerstatistics(player, date)
         name = nameteamgamestatus[0]
+        
         gamestatus = nameteamgamestatus[1]
-        for gamedate in gamestatus:
-            team = gamestatus[gamedate][0]
-            status = gamestatus[gamedate][1]
-
-        key_list = list(gamestatus.keys())
-        val_list = list(gamestatus.values())
-
-        position = val_list.index([team, status])
-        gameplayeddate = key_list[position]
+        for ineedteam in gamestatus:
+            team = gamestatus[ineedteam][0]
+            break
 
         value = bballdicts.teamdict[team]
 
         if team not in d:
             d.update({team: get_roster(value, date)})
-
-        else:
-            pass
 
         indexvalue = {name: int(d[team].loc[d[team]['PLAYER'] == name].index.values)}
         weight = (d[team]['WEIGHT'].loc[d[team].index[indexvalue[name]]])
@@ -113,6 +111,12 @@ if __name__ == '__main__':
         heightcalc = height.split('-')
         height = int(heightcalc[0]) * 12 + int(heightcalc[1])
         heightcalc.clear()
-        playerstuff = {name: [team, weight, height, gamestatus]}
-        data = (name, playerstuff[name][1], playerstuff[name][2], playerstuff[name][3])
-        print(data, end = '\n' * 2)
+        for gamedate in gamestatus:
+            name = name.replace(' ', '_')
+            team = gamestatus[gamedate][0].replace(' ', '_')
+            status = gamestatus[gamedate][1]           
+            data = (name, team, weight, height, gamedate, status)
+            print(data, end = '\n' * 2)
+            sqlfiller.tablefiller(con, data, date)
+    
+    con.close()
