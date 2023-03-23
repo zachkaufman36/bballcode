@@ -5,12 +5,12 @@ import os
 import json
 import bballdicts # Needs references to older non-existant teams to exist, otherwise, breaks
 import internetgrabber
-import sqlfiller
-import sqlite3
+import time
 from basketball_reference_scraper.teams import get_roster
 
 #path = r'C:\Users\zkaufman\Documents\Coding Fun\Random Code\bballcode'
-path = r'/mnt/c/users/baker/documents/bballrefcode/bballcode'
+#path = r'/mnt/c/users/baker/documents/bballrefcode/bballcode'
+path = os.getcwd()
 filenames = {}
 d = {}
 heightcalc = []
@@ -36,11 +36,7 @@ def playerstatistics(player, date):
     playerdict = json.load(f2)
     name = playerdict[player]
 
-    z = 0
     for count, i in enumerate(playerstats):
-        if z == 8:
-            break
-        z += 1
         date = i['date']
         status = i['active']
         if status == True:
@@ -63,6 +59,9 @@ def filefiller(path, date):
 
 # Checks to see if the date file exists for a user specified date. If it doesn't it is created
 def file_existance(path, date):
+    player_jsons = os.path.exists(f'{path}/player_jsons')
+    if player_jsons == False:
+        os.mkdir(f'{path}/player_jsons')
     existance = os.path.exists(f'{path}/player_jsons/{date}')
     if existance == False:
         os.mkdir(f'{path}/player_jsons/{date}')
@@ -72,11 +71,6 @@ if __name__ == '__main__':
 
     while date > currentyear or date < 1949:
         date = int(input("Please choose a year you would like to pull your data from: "))
-    
-    # connects to database 
-    con = sqlite3.connect(f"BasketballPlayers.db")
-
-    sqlfiller.tableexistance(con, date)
 
     file_existance(path, date)
     filefiller(path, date)
@@ -87,23 +81,25 @@ if __name__ == '__main__':
     file = open(f'{path}/player_jsons/{date}/playerdict_{date}.json', 'r')
     playerfile = json.load(file)
 
-    x = 0
     for player in playerfile:
-        if x == 4:
-            break
-        x += 1
         nameteamgamestatus = playerstatistics(player, date)
         name = nameteamgamestatus[0]
         
         gamestatus = nameteamgamestatus[1]
         for ineedteam in gamestatus:
             team = gamestatus[ineedteam][0]
-            break
+            value = bballdicts.teamdict[team]
 
-        value = bballdicts.teamdict[team]
+            if team not in d:
+                d.update({team: get_roster(value, date)})
 
-        if team not in d:
-            d.update({team: get_roster(value, date)})
+            if (d[team]['PLAYER'] == name).any() == False:
+                continue
+            else:
+                break
+
+        
+
 
         indexvalue = {name: int(d[team].loc[d[team]['PLAYER'] == name].index.values)}
         weight = (d[team]['WEIGHT'].loc[d[team].index[indexvalue[name]]])
@@ -117,6 +113,4 @@ if __name__ == '__main__':
             status = gamestatus[gamedate][1]           
             data = (name, team, weight, height, gamedate, status)
             print(data, end = '\n' * 2)
-            sqlfiller.tablefiller(con, data, date)
-    
-    con.close()
+        time.sleep(10)
