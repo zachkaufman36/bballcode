@@ -5,12 +5,13 @@ import os
 import json
 import bballdicts # Needs references to older non-existant teams to exist, otherwise, breaks
 import internetgrabber
+import sqlfiller
+import sqlite3
 import time
 from basketball_reference_scraper.teams import get_roster
 
 #path = r'C:\Users\zkaufman\Documents\Coding Fun\Random Code\bballcode'
-#path = r'/mnt/c/users/baker/documents/bballrefcode/bballcode'
-path = os.getcwd()
+path = r'/mnt/c/users/baker/documents/bballrefcode/bballcode'
 filenames = {}
 d = {}
 heightcalc = []
@@ -28,6 +29,7 @@ def playerstatistics(player, date):
 
     else:
         client.regular_season_player_box_scores(player_identifier=player, season_end_year=date, output_type = OutputType.JSON, output_file_path = f'{path}/player_jsons/{date}/{player}_{date}.json', include_inactive_games=True)
+        print('This should only happen once')
         f = open(f'./player_jsons/{date}/{player}_{date}.json','r')
         playerstats = json.load(f)
         filenames.update({player: 1})
@@ -59,9 +61,6 @@ def filefiller(path, date):
 
 # Checks to see if the date file exists for a user specified date. If it doesn't it is created
 def file_existance(path, date):
-    player_jsons = os.path.exists(f'{path}/player_jsons')
-    if player_jsons == False:
-        os.mkdir(f'{path}/player_jsons')
     existance = os.path.exists(f'{path}/player_jsons/{date}')
     if existance == False:
         os.mkdir(f'{path}/player_jsons/{date}')
@@ -71,6 +70,11 @@ if __name__ == '__main__':
 
     while date > currentyear or date < 1949:
         date = int(input("Please choose a year you would like to pull your data from: "))
+    
+    # connects to database 
+    con = sqlite3.connect(f"BasketballPlayers.db")
+
+    sqlfiller.tableexistance(con, date)
 
     file_existance(path, date)
     filefiller(path, date)
@@ -98,9 +102,6 @@ if __name__ == '__main__':
             else:
                 break
 
-        
-
-
         indexvalue = {name: int(d[team].loc[d[team]['PLAYER'] == name].index.values)}
         weight = (d[team]['WEIGHT'].loc[d[team].index[indexvalue[name]]])
         height = (d[team]['HEIGHT'].loc[d[team].index[indexvalue[name]]])
@@ -113,4 +114,7 @@ if __name__ == '__main__':
             status = gamestatus[gamedate][1]           
             data = (name, team, weight, height, gamedate, status)
             print(data, end = '\n' * 2)
-        time.sleep(10)
+            sqlfiller.tablefiller(con, data, date)
+        time.sleep(10)   
+    
+    con.close()
