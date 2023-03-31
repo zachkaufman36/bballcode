@@ -1,5 +1,6 @@
 from basketball_reference_web_scraper import client
 from basketball_reference_web_scraper.data import OutputType
+from basketball_reference_scraper.teams import get_roster
 import datetime
 import os
 import json
@@ -8,7 +9,8 @@ import internetgrabber
 import sqlfiller
 import sqlite3
 import time
-from basketball_reference_scraper.teams import get_roster
+import analysis
+
 
 #path = r'C:\Users\zkaufman\Documents\Coding Fun\Random Code\bballcode'
 path = r'/mnt/c/users/baker/documents/bballrefcode/bballcode'
@@ -29,7 +31,6 @@ def playerstatistics(player, date):
 
     else:
         client.regular_season_player_box_scores(player_identifier=player, season_end_year=date, output_type = OutputType.JSON, output_file_path = f'{path}/player_jsons/{date}/{player}_{date}.json', include_inactive_games=True)
-        print('This should only happen once')
         f = open(f'./player_jsons/{date}/{player}_{date}.json','r')
         playerstats = json.load(f)
         filenames.update({player: 1})
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     for player in playerfile:
         nameteamgamestatus = playerstatistics(player, date)
         name = nameteamgamestatus[0]
-        
+        print(name)
         gamestatus = nameteamgamestatus[1]
         for ineedteam in gamestatus:
             team = gamestatus[ineedteam][0]
@@ -101,7 +102,7 @@ if __name__ == '__main__':
                 continue
             else:
                 break
-
+            
         indexvalue = {name: int(d[team].loc[d[team]['PLAYER'] == name].index.values)}
         weight = (d[team]['WEIGHT'].loc[d[team].index[indexvalue[name]]])
         height = (d[team]['HEIGHT'].loc[d[team].index[indexvalue[name]]])
@@ -110,11 +111,11 @@ if __name__ == '__main__':
         heightcalc.clear()
         for gamedate in gamestatus:
             name = name.replace(' ', '_')
+            name = name.replace("'", "")
             team = gamestatus[gamedate][0].replace(' ', '_')
             status = gamestatus[gamedate][1]           
             data = (name, team, weight, height, gamedate, status)
-            print(data, end = '\n' * 2)
             sqlfiller.tablefiller(con, data, date)
         time.sleep(10)   
-    
+    analysis.sql_data(con, date)
     con.close()

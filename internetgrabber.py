@@ -12,18 +12,11 @@ def players_of_year(path, date):
 
 
     for result in results:
-        name = result.get('csk')
-        tag = result.get('data-append-csv')
-        if type(name) is not str:
+        namecheck = result.get('csk')
+        if type(namecheck) is not str:
             continue
-    
-        li = list(name.split(','))
-        li.append(" ")
-        li[2] = li[0]
-        li[0] = li[1]
-        li[1] = " "
-        name = ''.join(li)
-        li.clear()
+        name = (result.find('a').contents[0])
+        tag = result.get('data-append-csv')
 
         if tag in namelist:
             pass
@@ -35,28 +28,3 @@ def players_of_year(path, date):
         data.write(json.dumps(namelist))
 
     data.close()
-
-
-
-
-
-
-"""playername = []
-
-f = open("playernames.txt", "r")
-f2 = open("cleannames.txt", "w")
-for line in f:
-    if line in playername:
-        pass
-    else:
-        playername.append(line)
-        f2.write(line)
-        
-f.close()
-f2.close()"""
-
-"""f = open("cleannames.txt", "r")
-for line in f:
-    playername = line
-
-    #url = f'https://www.basketball-reference.com{playername}'"""
