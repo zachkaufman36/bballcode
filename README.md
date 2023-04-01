@@ -1,5 +1,5 @@
 # bballcode
-A project designed around finding the biggest change in weight from an NBA team's start game to end game. This will be displayed by fun graphics. Used as a learning tool to learn MySQL, Ubuntu, web scraping, matplotlib, ect. 
+A project designed around finding the average change in weight for an NBA team over an entire season. This will be displayed by fun graphics. Used as a learning tool to learn MySQL, Ubuntu, web scraping, matplotlib, ect. 
 
 FIRST STAGE:
 Pick a website to gather data from. Basketball Reference was chosen and 2 APIs were found. One was used to gather game-to-game data while the other is used to gather players' weight and heights. 

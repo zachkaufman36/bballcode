@@ -1,11 +1,7 @@
 import sqlite3
-import numpy as np
-import pandas as pd
 from matplotlib.pyplot import figure
-import matplotlib.pyplot as plt #figure this out. Will be a better display
+import matplotlib.pyplot as plt
 
-#https://www.python-graph-gallery.com/connected-scatter-plot/
-#https://towardsdatascience.com/creating-bar-chart-race-animation-with-python-cdb01144074e better idea than execution
 
 teams = {} # Data in this dictionary will be {team: Teams}
 fullinfo = {}
@@ -38,10 +34,13 @@ class Team:
         return startweight - self.games[gamekeys[-1]] 
           
     def data_filler(self):
+        avg_weight = 0
         startweight, gamekeys = self.start_weight()
         for key in gamekeys:
             self.games[key] -= startweight
-        return self.games
+            avg_weight += self.games[key]
+        avg_weight = avg_weight/len(list(gamekeys))
+        return avg_weight
     
     def graph_values(self):
         return {'dates': self.games.keys(), 'weights': self.games.values()}
@@ -83,7 +82,7 @@ def sql_data(con, date): #input data into dataframe that can be used for bargrap
     #colors = [(152, 0, 46),(0, 71, 27),(0, 22, 65),(196, 206, 211),(0, 0, 0),(29, 17, 96),(93, 118, 169),(134, 0, 56),(0, 125, 197),(206, 17, 65),(85, 37, 130),(224, 58, 62),(206, 17, 65),(0, 125, 195),(206, 17, 65),(0, 43, 92),(0, 71, 27),(91, 43, 130),(0, 120, 140),(245, 132, 38),(255, 198, 39),(200, 16, 46),(255, 199, 44),(120, 190, 32),(200, 16, 46),(200, 16, 46),(0, 45, 98),(196, 214, 0),(0, 107, 182),(0, 122, 51)]
     #x = 0
     for key in keylist:
-        fullinfo.update({key: teams[key].change_weight()})
+        fullinfo.update({key: teams[key].data_filler()})
         graph_colors.append(team_colors[key])
         """f = open('writekeys.txt','a')
         f.write(f' "{key}": "{rgb2hex(colors[x][0],colors[x][1],colors[x][2])}",')
